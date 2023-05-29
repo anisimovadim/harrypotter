@@ -18,7 +18,9 @@
       <div class="logo">
         <img src="../../assets/img/logo.svg" alt="LOGO">
       </div>
-      <my-input :myplaceholder="'Search'" :myvalue="valueSearch" @input="setValue" class="input"/>
+
+      <my-input :class="'search'" :myplaceholder="'Search'" :myvalue="valueSearch" @input="setValue" class="input"/>
+
         <div class="grids">
             <my-select :myalue="valueOption3" @change="changeValue3">
                 <select-sort :sort-options="sortOptions3" :text="text3"/>
@@ -158,5 +160,11 @@ header{
     display: flex;
     align-items: center;
     gap: 20px;
+}
+.search{
+    background-image: url("/src/assets/img/searchLogo.svg");
+    background-repeat: no-repeat;
+    background-position-y: center;
+    background-position-x: 99%;
 }
 </style>

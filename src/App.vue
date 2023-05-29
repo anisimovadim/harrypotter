@@ -18,12 +18,43 @@
                  :text4="'Фильтр по факультету'"
                  :text5="'Фильтр по патронусу'"
         ></my-header>
-        <likes-component :count-wizard="this.characters.filter(i=>i.check===true && i.wizard===true).length"
+        <block-autentification v-if="!identification" v-model:show-reg="showsReg" v-model:show-aut="showsAut"/>
+        <user-log v-if="identification" v-model:data="dataUser"/>
+        <likes-component v-if="identification" :count-wizard="this.characters.filter(i=>i.check===true && i.wizard===true).length"
                        :count-no-wizard="this.characters.filter(i=>i.check===true && i.wizard!==true).length"
                        class="likes-box"
                          />
-        <character-list @give="checks" @send="send" :characters="searchingCharacter"/>
+        <character-list v-model:idenf1="identification" @give="checks" @send="send" :characters="searchingCharacter"/>
         <module-character v-model:showu="shows" v-model:character="characterForModule"/>
+        <window-reg-aut v-model:show="showsReg">
+            <module-registration
+                    @createuser="registr"
+                    v-model:email1="email"
+                    v-model:gender1="gender"
+                    v-model:last-name1="lastName"
+                    v-model:last-name21="lastName2"
+                    v-model:name1="name"
+                    v-model:number-phone1="numberPhone"
+                    v-model:year1="year"
+                    v-model:login1="login"
+                    v-model:password1="password"
+                    v-model:error1="er1"
+                    v-model:error2="er2"
+                    v-model:error3="er3"
+                    v-model:error4="er4"
+                    v-model:error5="er4"
+                    v-model:error6="er6"
+                    v-model:error7="er7"
+                    v-model:error8="er8"
+                    v-model:error9="er9"
+                    :genderOption="sortOptions3"
+                    v-model:value-gender="valueGender"
+                    v-model:close-show="showsReg"
+                   />
+        </window-reg-aut>
+        <window-reg-aut v-model:show="showsAut">
+            <module-autorization v-model:value1="valueLogin" v-model:value2="valuePsw" @senduser="autorization"/>
+        </window-reg-aut>
     </div>
   </div>
 </template>
@@ -33,14 +64,26 @@ import CharacterList from "@/components/CharacterList.vue";
 import MyHeader from "@/components/UI/MyHeader.vue";
 import LikesComponent from "@/components/LikesComponent.vue";
 import ModuleCharacter from "@/components/ModuleCharacter.vue";
+import WindowRegAut from "@/components/UI/WindowRegAut.vue";
+import ModuleRegistration from "@/components/ModuleRegistration.vue";
+import BlockAutentification from "@/components/UI/BlockAutentification.vue";
+import ModuleAutorization from "@/components/ModuleAutorization.vue";
+import UserLog from "@/components/UserLog.vue";
 export default {
-    components: {ModuleCharacter, CharacterList, MyHeader, LikesComponent},
+    components: {
+        UserLog,
+        ModuleAutorization,
+        BlockAutentification,
+        ModuleRegistration, WindowRegAut, ModuleCharacter, CharacterList, MyHeader, LikesComponent},
     data(){
         return{
             characters:[],
             characterChecks: '',
             characterForModule:{},
             shows:false,
+            showsReg:false,
+            showsAut:false,
+            valueGender: ' ',
             sortOptions1:[
                 {dis:false, value: 'name', name: 'По имени персонажа'},
                 {dis:false, value: 'actor', name: 'По имени актера'},
@@ -51,8 +94,8 @@ export default {
                 {dis:false, value: 'big', name: 'По возрастанию'},
             ],
             sortOptions3:[
-                {pole: 'gender', value: 'male', name: 'мужской'},
-                {pole: 'gender', value: 'female', name: 'женский'},
+                {value: 'male', name: 'мужской'},
+                {value: 'female', name: 'женский'},
             ],
             sortOptions4:[
                 {value: 'Gryffindor', name: 'Gryffindor'},
@@ -68,7 +111,29 @@ export default {
             valueOption5: ' ',
             mainValueSearch: '',
             arrayLikesing: [],
-            pt:[]
+            pt:[],
+            identification: false,
+            dataUser:[],
+            name:'',
+            lastName: '',
+            lastName2: '',
+            email: '',
+            numberPhone: '',
+            gender: '',
+            year: '',
+            login:'',
+            password:'',
+            valueLogin:'',
+            valuePsw:'',
+            er1:false,
+            er2:false,
+            er3:false,
+            er4:false,
+            er5:false,
+            er6:false,
+            er7:false,
+            er8:false,
+            er9:false,
         }
     },
     methods:{
@@ -96,6 +161,64 @@ export default {
             this.characterForModule=ch
             console.log(sh)
             console.log(this.shows)
+        },
+        registr(user, show){
+
+            let regexp4 = /^8\([0-9]{3}\)[0-9]{3}-[0-9]{2}-[0-9]{2}$/g;
+            let regexp5 = /^[a-z]{4,}@[a-z]{3,}.(ru|com|inbox)$/g;
+            this.er1=!/^[А-Я]{1}[а-я]{1,}$/g.test(user.name);
+            this.er2=!/^[А-Я]{1}[а-я]{1,}$/g.test(user.lastName);
+            this.er3=!/^[А-Я]{1}[а-я]{1,}$/g.test(user.lastName2);
+            this.er4=!regexp5.test(user.email);
+            this.er5=!regexp4.test(user.numberPhone);
+            this.er6 =  !Boolean(this.valueGender !== ' ');
+            this.er7 = !Boolean((+this.year)>=10);
+            this.er8=!Boolean(user.login.length>5);
+            this.er9=!Boolean(user.password.length>8);
+            console.log(this.er7)
+            let c = 0
+            if (!this.er1 && !this.er2 && !this.er3 && !this.er4 && !this.er5 && !this.er7 && !this.er6) {
+                for (let i =0; i<localStorage.length;i++){
+                    const key = localStorage.key(i);
+                    const user1 = JSON.parse(localStorage[key]);
+                    if (user.email===user1.email || user.numberPhone===user1.numberPhone || user.password===user1.password || user.login===user1.login){
+                        alert('Пользователь уже существует');
+                        c=1
+                        break
+                    }
+                }
+                if (c!==1){
+                    localStorage.setItem(user.id, JSON.stringify(user));
+                    show=false
+                    this.showsReg=show
+                }
+            }
+
+            this.name='';
+            this.lastName= '';
+            this.lastName2= '';
+            this.email= '';
+            this.numberPhone= '';
+            this.gender= '';
+            this.year= '';
+            this.valueGender=' ';
+            this.password='';
+            this.login='';
+
+        },
+        autorization(login, password){
+            console.log(login)
+            for (let i = 0; i<localStorage.length;i++){
+                const key = localStorage.key(i);
+                const user = JSON.parse(localStorage[key]);
+                if (user.login===login && user.password===password){
+                    this.identification=true;
+                    this.dataUser.push(user.lastName);
+                    this.dataUser.push(user.name);
+                    this.showsAut=false
+                    break
+                }
+            }
         }
 
     },

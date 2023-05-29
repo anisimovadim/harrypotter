@@ -9,7 +9,7 @@
         </div>
 
 
-        <my-like @click.stop :input-id="character.name.replace(' ','-')" class="likes"
+        <my-like v-if="idenf" @click.stop :input-id="character.name.replace(' ','-')" class="likes"
                  :class="character.name.replace(' ','-')"
                  :character-value="JSON.stringify(character)"
                  @give="this.$emit('give', character)"
@@ -33,6 +33,10 @@ export default {
       show1:{
         type: Boolean,
           default:false
+      },
+      idenf:{
+        type:Boolean,
+          default: false
       }
   },
     methods:{

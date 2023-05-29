@@ -33,9 +33,5 @@ props:{
     letter-spacing: -0.065em;
     color: rgba(255, 255, 255, 0.4);
     padding: 10px;
-    background-image: url("/src/assets/img/searchLogo.svg");
-    background-repeat: no-repeat;
-    background-position-y: center;
-    background-position-x: 99%;
 }
 </style>

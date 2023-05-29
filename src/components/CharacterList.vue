@@ -7,6 +7,7 @@
                             v-for="(character) in characters"
                             @give="this.$emit('give', character)"
                             @send="this.$emit('send', show, character)"
+                            :idenf="idenf1"
             ></character-item>
         </ul>
     </div>
@@ -24,6 +25,10 @@ export default {
         show:{
             type:Boolean,
             default:false
+        },
+        idenf1:{
+          type:Boolean,
+          default: false
         },
       indexCharacter:{
           type: Number
